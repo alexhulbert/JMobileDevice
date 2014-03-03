@@ -2,3 +2,6 @@
 	path = src/com/alexhulbert/jmobiledevice
 	url = https://github.com/Triforce1/JMobileDevice.git
 	branch = code
+[submodule "Python/pymobiledevice"]
+	path = Python/pymobiledevice
+	url = https://github.com/PythEch/pymobiledevice.git
