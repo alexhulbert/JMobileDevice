@@ -1,0 +1,8 @@
+/JMobileDevice/nbproject/private/
+=======
+*.class
+
+# Package Files #
+*.war
+*.ear
+/JMobileDevice_old/nbproject/private/
