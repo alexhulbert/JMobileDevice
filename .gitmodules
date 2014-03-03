@@ -1,4 +1,4 @@
 [submodule "src/com/alexhulbert/jmobiledevice"]
 	path = src/com/alexhulbert/jmobiledevice
-	url = ./
+	url = https://github.com/Triforce1/JMobileDevice.git
 	branch = code
