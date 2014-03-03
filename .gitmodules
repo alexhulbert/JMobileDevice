@@ -1,0 +1,4 @@
+[submodule "src/com/alexhulbert/jmobiledevice"]
+	path = src/com/alexhulbert/jmobiledevice
+	url = ./
+	branch = code
