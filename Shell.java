@@ -1,6 +1,8 @@
 package com.alexhulbert.jmobiledevice;
 
 import static com.alexhulbert.jmobiledevice.Pymobiledevice.pi;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -11,8 +13,9 @@ import org.python.core.PyObject;
  * @author Taconut
  */
 public class Shell extends Wrapper {
-    private String clientID = Utils.unique();
-    private AFC client;
+    private final String clientID = Utils.unique();
+    private final AFC client;
+    private final JsonParser jp = new JsonParser();
     
     /**
      * Creates a new Shell instance
@@ -68,6 +71,7 @@ public class Shell extends Wrapper {
             opcode = opcode.replace("ln", "link");
             opcode = opcode.replace("hd", "hexdump");
             opcode = opcode.replace("info", "infos");
+            opcode = opcode.replace("df", "infos");
             String operand = command.substring(opcode.length() + (command.length() - command.trim().length()) + 1);
             operand = operand.replace("'", "\\'"); //Escape quotes
             rets.add(pi.eval(id + ".do_" + opcode + "('" + operand + "')"));
@@ -183,8 +187,8 @@ public class Shell extends Wrapper {
      * Gets various information about the iDevice
      * @return JSON string of data
      */
-    public String info() {
-        return pi.eval(id + ".do_infos('')").toString();
+    public JsonObject df() {
+        return (JsonObject)jp.parse(pi.eval(id + ".do_infos('')").toString());
     }
     
     /**
@@ -209,7 +213,7 @@ public class Shell extends Wrapper {
      * @param fileName The file to get information about
      * @return Info about the file
      */
-    public String about(String fileName) {
-        return pi.eval(id + ".do_about('" + fileName + "')").toString();
+    public JsonObject about(String fileName) {
+        return (JsonObject)jp.parse(pi.eval(id + ".do_about('" + fileName + "')").toString());
     }
 }
