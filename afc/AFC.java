@@ -1,5 +1,10 @@
-package com.alexhulbert.jmobiledevice;
+package com.alexhulbert.jmobiledevice.afc;
 
+import com.alexhulbert.jmobiledevice.FileHandle;
+import com.alexhulbert.jmobiledevice.Lockdown;
+import com.alexhulbert.jmobiledevice.Pymobiledevice;
+import com.alexhulbert.jmobiledevice.Utils;
+import com.alexhulbert.jmobiledevice.Wrapper;
 import static com.alexhulbert.jmobiledevice.Pymobiledevice.pi;
 import org.python.core.PyArray;
 import org.python.core.PyString;
@@ -18,7 +23,7 @@ public class AFC extends Wrapper implements AFCConstants {
      public AFC(Lockdown lockdown) {
          Pymobiledevice.use("pymobiledevice", "afc");
          Pymobiledevice.use("pymobiledevice", "lockdown");
-         pi.exec(id + "=afc.AFCClient('" + lockdown.id + "')");
+         pi.exec(id + "=afc.AFCClient('" + lockdown.getId() + "')");
      }
      
      public AFC(String ID) {

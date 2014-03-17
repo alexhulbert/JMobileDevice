@@ -1,4 +1,4 @@
-package com.alexhulbert.jmobiledevice;
+package com.alexhulbert.jmobiledevice.afc;
 
 /**
  *

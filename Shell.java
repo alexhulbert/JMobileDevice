@@ -1,5 +1,7 @@
 package com.alexhulbert.jmobiledevice;
 
+import com.alexhulbert.jmobiledevice.afc.AFCConstants;
+import com.alexhulbert.jmobiledevice.afc.AFC;
 import static com.alexhulbert.jmobiledevice.Pymobiledevice.pi;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
