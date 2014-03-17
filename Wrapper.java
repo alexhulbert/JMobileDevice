@@ -8,7 +8,8 @@ import org.python.core.PyObject;
  * @author Taconut
  */
 public class Wrapper {
-    protected String id = Utils.unique();    
+    protected String id = Utils.unique();
+    protected String lockdownId = Utils.unique();
     
     public void execRaw(String python) {
         pi.exec(python);
@@ -24,5 +25,14 @@ public class Wrapper {
     
     public void setRaw(String var, Object value) {
         pi.set(var, value);
+    }
+    
+    public Lockdown getLockdown() {
+        pi.exec(lockdownId + "=" + id + ".lockdown");
+        return new Lockdown(lockdownId);
+    }
+    
+    public String getId() {
+        return id;
     }
 }
