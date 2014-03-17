@@ -4,9 +4,12 @@ import static com.alexhulbert.jmobiledevice.Pymobiledevice.pi;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import org.apache.commons.io.FileUtils;
 import org.python.core.PyObject;
+import org.python.core.PyString;
 
 /**
  *
@@ -33,7 +36,7 @@ public class Shell extends Wrapper {
      */
     public Shell(Lockdown lockdown) {
         Pymobiledevice.use("pymobiledevice", "afc");
-        pi.exec(id + "=afc.AFCShell(" + lockdown.id + ")");
+        pi.exec(id + "=afc.AFCShell(" + lockdown.getId() + ")");
         pi.exec(clientID + "=" + id + ".afc");
         client = new AFC(clientID);
     }
@@ -58,8 +61,23 @@ public class Shell extends Wrapper {
     }
     
     /**
+     * Runs a shell script
+     * @see Shell#run(java.lang.String) 
+     * @param script the file to run
+     * @return The output of each command
+     */
+    public PyObject[] run(File script) {
+        try {
+            return run(FileUtils.readFileToString(script));
+        } catch (IOException e) {/*stderr*/}
+        return null;
+    }
+    
+    /**
      * Runs shell code on an iDevice
      * Valid commands are: pwd, ln, ls, cat, cd, mv, push, pull, info, about, mkdir, rmdir, and rm
+     * You can use <, >, and >> to do file I/O
+     * Put a exclamation point (!) before >>, >, or < to write to a file on the computer
      * @param code Shell code to run
      * @return The outputs of each command
      */
@@ -67,18 +85,103 @@ public class Shell extends Wrapper {
         String[] lines = code.split("(;)|(\\n)");
         List<PyObject> rets = new ArrayList<PyObject>();
         for (String command : lines) {
-            String opcode = command.trim().split(" ")[0];
+            command = command.trim();
+            int pipeType = AFCConstants.AFC_CMD_NONE;
+            String pipe = "";
+            int exclam = ((command.indexOf("!>") + 1) | (command.indexOf("!<") + 1)) - 1;
+            Boolean localPipe = false;
+            if (exclam != -1) { 
+                command = command.substring(0, exclam) + command.substring(exclam + 1);
+                localPipe = true;
+            }
+            if (command.contains(">>")) {
+                pipeType = AFCConstants.AFC_CMD_TOTO;
+                pipe = command.split(">>")[1].trim();
+                command = command.split(">>")[0].trim();
+            } else if (command.contains(">")) {
+                pipeType = AFCConstants.AFC_CMD_TO;
+                pipe = command.split(">")[1].trim();
+                command = command.split(">")[0].trim();
+            } else if (command.contains("<")) {
+                pipeType = AFCConstants.AFC_CMD_FROM;
+                pipe = command.split("<")[1].trim();
+                command = command.split("<")[0].trim();
+            }
+            String opcode = command.split(" ")[0];
             opcode = opcode.replace("ln", "link");
             opcode = opcode.replace("hd", "hexdump");
             opcode = opcode.replace("info", "infos");
             opcode = opcode.replace("df", "infos");
-            String operand = command.substring(opcode.length() + (command.length() - command.trim().length()) + 1);
+            if (opcode.startsWith("'") || opcode.startsWith("\"")) {
+                opcode = opcode.substring(1);
+            }
+            if (opcode.endsWith("'") || opcode.endsWith("\"")) {
+                opcode = opcode.substring(opcode.length() - 1);
+            }
+            String operand = command.contains(" ") ? command.substring(command.split(" ")[0].length() + 1) : "";
             operand = operand.replace("'", "\\'"); //Escape quotes
-            rets.add(pi.eval(id + ".do_" + opcode + "('" + operand + "')"));
+            
+            PyObject val = null;
+            if (localPipe) {
+                switch (pipeType) {
+                    case AFCConstants.AFC_CMD_TO:
+                        val = pi.eval(id + ".do_" + opcode + "('" + operand + "')");
+                        try {
+                            FileUtils.writeStringToFile(new File(pipe), val.toString(), false);
+                        } catch (IOException e) {/*stderr*/}
+                    break;
+                        
+                    case AFCConstants.AFC_CMD_TOTO:
+                        val = pi.eval(id + ".do_" + opcode + "('" + operand + "')");
+                        try {
+                            FileUtils.writeStringToFile(new File(pipe), val.toString(), true);
+                        } catch (IOException e) {/*stderr*/}
+                    break;
+                        
+                    case AFCConstants.AFC_CMD_FROM:
+                        try {
+                            operand += FileUtils.readFileToString(new File(pipe));
+                        } catch (IOException ex) {/*stderr*/}
+                        String tmp = Utils.unique();
+                        pi.set(tmp, new PyString(operand));
+                        val = pi.eval(id + ".do_" + opcode + "(" + tmp + ")");
+                        pi.set(tmp, pi.eval("None"));
+                    break;
+                        
+                    default:
+                        val = pi.eval(id + ".do_" + opcode + "('" + operand + "')");
+                    break;
+                }
+            } else {
+                switch (pipeType) {
+                    case AFCConstants.AFC_CMD_TO:
+                        val = pi.eval(id + ".do_" + opcode + "('" + operand + "')");
+                        client.set_file_contents(pipe, val.toString());
+                    break;
+
+                    case AFCConstants.AFC_CMD_TOTO:
+                        val = pi.eval(id + ".do_" + opcode + "('" + operand + "')");
+                        client.set_file_contents(pipe, client.get_file_contents(pipe) + val.toString());
+                    break;
+
+                    case AFCConstants.AFC_CMD_FROM:
+                        operand += client.get_file_contents(pipe);
+                        String tmp = Utils.unique();
+                        pi.set(tmp, new PyString(operand));
+                        val = pi.eval(id + ".do_" + opcode + "(" + tmp + ")");
+                        pi.set(tmp, pi.eval("None"));
+                    break;
+
+                    default: 
+                        val = pi.eval(id + ".do_" + opcode + "('" + operand + "')");
+                    break;
+                }
+            }
+            rets.add(val);
         }
+
         return rets.toArray(new PyObject[rets.size()]);
     }
-    
     /**
      * Gets the current directory
      * @return The current directory (relative to ~mobile/Documents
