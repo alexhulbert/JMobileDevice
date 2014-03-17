@@ -227,4 +227,21 @@ public interface AFCConstants {
     * unlock
     */
    public static final int AFC_LOCK_UN = 8 | 4;
+   
+   public static final int AFC_CMD_NONE = 0;
+   
+   /**
+    * >
+    */
+   public static final int AFC_CMD_TO = 1;
+   
+   /**
+    * >>
+    */
+   public static final int AFC_CMD_TOTO = 2;
+   
+   /**
+    * <
+    */
+   public static final int AFC_CMD_FROM = 3;
 }

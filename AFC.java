@@ -2,6 +2,7 @@ package com.alexhulbert.jmobiledevice;
 
 import static com.alexhulbert.jmobiledevice.Pymobiledevice.pi;
 import org.python.core.PyArray;
+import org.python.core.PyString;
 
 /**
  *
@@ -10,16 +11,19 @@ import org.python.core.PyArray;
 public class AFC extends Wrapper implements AFCConstants {
      public AFC() {
          Pymobiledevice.use("pymobiledevice", "afc");
+         Pymobiledevice.use("pymobiledevice", "lockdown");
          pi.exec(id + "=afc.AFCClient()");
      }
      
      public AFC(Lockdown lockdown) {
          Pymobiledevice.use("pymobiledevice", "afc");
+         Pymobiledevice.use("pymobiledevice", "lockdown");
          pi.exec(id + "=afc.AFCClient('" + lockdown.id + "')");
      }
      
      public AFC(String ID) {
          Pymobiledevice.use("pymobiledevice", "afc");
+         Pymobiledevice.use("pymobiledevice", "lockdown");
          id = ID;
      }
      
@@ -69,7 +73,7 @@ public class AFC extends Wrapper implements AFCConstants {
      
      public void set_file_contents(String fileName, String data) {
          String tmp = Utils.unique();
-         pi.set(tmp, data);
+         pi.set(tmp, new PyString(data));
          pi.exec(id + ".set_file_contents('" + fileName + "'," + tmp + ")");
          pi.set(tmp, pi.eval("None"));
      }
