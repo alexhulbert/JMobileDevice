@@ -27,28 +27,15 @@ import org.apache.commons.io.FileUtils;
  */
 public class Extractor {
     /**
-     * constructor
-     * 
-     * @param sourceDirectory directory (in a jar on the classpath) to extract
-     * @param inputDirectory the location to extract to
-     * @throws IOException if an IO exception occurs
-     */
-    public Extractor(String sourceDirectory, String writeDirectory) throws IOException {
-        // make sure write directory exists
-        new File(writeDirectory).mkdirs();
-        // extract into the write directory
-        extract(sourceDirectory, writeDirectory);
-    }
-
-    /**
      * extract the subdirectory from a jar on the classpath to {@code writeDirectory}
      * 
      * @param sourceDirectory directory (in a jar on the classpath) to extract
      * @param writeDirectory the location to extract to
      * @throws IOException if an IO exception occurs
      */
-    private void extract(String sourceDirectory, String writeDirectory) throws IOException {
-        final URL dirURL = getClass().getResource(sourceDirectory);
+    public static void extract(String sourceDirectory, String writeDirectory) throws IOException {
+        new File(writeDirectory).mkdirs();
+        final URL dirURL = Extractor.class.getResource(sourceDirectory);
         final String path = sourceDirectory.substring(1);
 
         if ((dirURL != null) && dirURL.getProtocol().equals("jar")) {

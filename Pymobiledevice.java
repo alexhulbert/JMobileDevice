@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import org.apache.commons.io.FileUtils;
+import org.python.google.common.io.Files;
 import org.python.util.PythonInterpreter;
 
 /**
@@ -16,18 +17,48 @@ public class Pymobiledevice {
     public static boolean initiated;
     private static List<String> libraries = new ArrayList<String>();
     public static PythonInterpreter pi;
+    public static File tmpFolder;
     
     static {
         init();
     }
     
+    private static void autoClean(File dir) {
+        dir.deleteOnExit();  
+        File[] files = dir.listFiles();  
+        if (files != null) {  
+            for (File file : files) {  
+                if (file.isDirectory()) {  
+                    autoClean(file);  
+                } else {  
+                    file.deleteOnExit();  
+                }  
+            }  
+        }
+    }
+    
     public static void init() {
         try {
-            new Extractor("/pymobiledevice", "./tmp/pymobiledevice");
+            //Is it better practice to use Files.createTmpDir()?
+            tmpFolder = new File("./tmp");
+            File location = new File(tmpFolder, "pymobiledevice");
+            if (!location.exists()) {
+                Extractor.extract("/pymobiledevice", location.getAbsolutePath());
+            }
+            Runtime.getRuntime().addShutdownHook(new Thread() {
+                @Override
+                public void run() {
+                    try {
+                        FileUtils.deleteDirectory(tmpFolder);
+                    } catch (IOException e) {
+                        //Oh well. I guess the tmp files are still 
+                    }
+                }
+            });
             pi = new PythonInterpreter();
             pi.exec("import sys");
             
-            File[] libs = new File("./tmp/pymobiledevice/jar").listFiles(new FilenameFilter() {
+            File[] libs = new File(location, "jar").listFiles(new FilenameFilter() {
                 @Override
                 public boolean accept(File dir, String name) {
                     return name.toLowerCase().endsWith(".jar");
@@ -37,7 +68,7 @@ public class Pymobiledevice {
                 pi.exec("sys.path.append('" + lib.getAbsolutePath().replace("\\", "\\\\") + "')");
             }
             
-            pi.exec("sys.path.append('" + new File("./tmp/pymobiledevice").getAbsolutePath().replace("\\", "\\\\") + "')");
+            pi.exec("sys.path.append('" + location.getAbsolutePath().replace("\\", "\\\\") + "')");
             initiated = true;
         } catch (IOException e) {
             initiated = new File("./tmp/pymobiledevice").exists();
