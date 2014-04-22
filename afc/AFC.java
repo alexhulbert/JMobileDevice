@@ -63,10 +63,12 @@ public class AFC extends Wrapper implements AFCConstants {
         pi.exec(id + ".make_link('" + target + "','" + linkName + "','" + mode + "')");
     }
 
+    @Deprecated
     public FileHandle file_open(String fileName) {
         return new FileHandle(id, pi.eval(id + ".file_open('" + fileName + "')"), fileName);
     }
 
+    @Deprecated
     public FileHandle file_open(String fileName, int mode) {
         return new FileHandle(id, pi.eval(id + ".file_open('" + fileName + "')"), fileName);
     }
@@ -75,10 +77,12 @@ public class AFC extends Wrapper implements AFCConstants {
         pi.exec(id + ".file_remove('" + fileName + "')");
     }
 
+    @Deprecated
     public String get_file_contents(String fileName) {
         return pi.eval(id + ".get_file_contents('" + fileName + "')").toString();
     }
 
+    @Deprecated
     public void set_file_contents(String fileName, String data) {
         String tmp = Utils.unique();
         pi.set(tmp, new PyString(data));
