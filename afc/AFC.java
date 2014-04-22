@@ -81,7 +81,7 @@ public class AFC extends Wrapper implements AFCConstants {
     //Stupid Fun Fact #1: "renaming" wasn't a thing in UNIX.
     //There was just "mv", which stood for "move".
     public void move(String fileName, String newName) {
-        pi.exec(id + ".rename_path('" + fileName + "," + newName + "')");
+        pi.exec(id + ".rename_path('" + fileName + "','" + newName + "')");
     }
 
     @Deprecated
