@@ -3,14 +3,11 @@ package com.alexhulbert.jmobiledevice.diagnostics;
 import com.alexhulbert.jmobiledevice.Lockdown;
 import com.alexhulbert.jmobiledevice.Pymobiledevice;
 import static com.alexhulbert.jmobiledevice.Pymobiledevice.pi;
-import com.alexhulbert.jmobiledevice.Utils;
 import com.alexhulbert.jmobiledevice.Wrapper;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
-import org.python.core.PyArray;
-import org.python.core.PyString;
 
 /**
  *
@@ -33,9 +30,13 @@ public class Diagnostics extends Wrapper implements DiagConstants {
         pi.exec(id + "=diagnostics_relay.DIAGClient()");
     }
     
-    public Diagnostics(String id) {
+    private Diagnostics(String id) {
         Pymobiledevice.use("pymobiledevice", "diagnostics_relay");
         this.id = id;
+    }
+    
+    public static Diagnostics connect(String id) {
+        return new Diagnostics(id);
     }
     
     public Diagnostics(Lockdown lockdown) {

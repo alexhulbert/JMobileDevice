@@ -1,5 +1,6 @@
-package com.alexhulbert.jmobiledevice;
+package com.alexhulbert.jmobiledevice.afc;
 
+import com.alexhulbert.jmobiledevice.Utils;
 import com.alexhulbert.jmobiledevice.afc.AFC;
 import static com.alexhulbert.jmobiledevice.Pymobiledevice.pi;
 import org.python.core.PyObject;
@@ -8,6 +9,7 @@ import org.python.core.PyObject;
  *
  * @author Taconut
  */
+@Deprecated
 public class FileHandle {
     private String parentID;
     public String id = Utils.unique();
@@ -40,7 +42,7 @@ public class FileHandle {
     }
     
     public AFC parent() {
-        return new AFC(parentID);
+        return AFC.connect(parentID);
     }
     
     public String read() {

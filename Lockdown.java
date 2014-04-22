@@ -28,18 +28,19 @@ public class Lockdown extends Wrapper {
         pi.exec(id + ".lockdown=" + id);
     }
     
-    public Lockdown(char[] UDID) {
+    public Lockdown(String UDID) {
         Pymobiledevice.use("pymobiledevice", "lockdown");
         pi.exec(id + "= lockdown.LockdownClient('" + new String(UDID) + "')");
         pi.exec(id + ".lockdown=" + id);
     }
     
-    public Lockdown(String id) {
+    private Lockdown(String id, boolean dummy) {
         Pymobiledevice.use("pymobiledevice", "lockdown");
         this.id = id;
         pi.exec(id + ".lockdown=" + id);
-        
     }
     
-    
+    public static Lockdown connect(String id) {
+        return new Lockdown(id, false);
+    }
 }

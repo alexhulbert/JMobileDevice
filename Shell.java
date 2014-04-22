@@ -29,7 +29,7 @@ public class Shell extends Wrapper {
         Pymobiledevice.use("pymobiledevice", "afc");
         pi.exec(id + "=afc.AFCShell()");
         pi.exec(clientID + "=" + id + ".afc");
-        client = new AFC(clientID);
+        client = AFC.connect(clientID);
     }
     
     /**
@@ -40,18 +40,22 @@ public class Shell extends Wrapper {
         Pymobiledevice.use("pymobiledevice", "afc");
         pi.exec(id + "=afc.AFCShell(" + lockdown.getId() + ")");
         pi.exec(clientID + "=" + id + ".afc");
-        client = new AFC(clientID);
+        client = AFC.connect(clientID);
+    }
+    
+    private Shell(String ID) {
+        id = ID;
+        Pymobiledevice.use("pymobiledevice", "afc");
+        pi.exec(clientID + "=" + id + ".afc");
+        client = AFC.connect(clientID);
     }
     
     /**
      * Attaches a shell class to an existing AFCShell
-     * @param ID The id of an already-existing AFC instance
+     * @param id The id of an already-existing AFC instance
      */
-    public Shell(String ID) {
-        id = ID;
-        Pymobiledevice.use("pymobiledevice", "afc");
-        pi.exec(clientID + "=" + id + ".afc");
-        client = new AFC(clientID);
+    public static Shell connect(String id) {
+        return new Shell(id);
     }
     
     /**
