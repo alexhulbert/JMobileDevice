@@ -73,8 +73,15 @@ public class AFC extends Wrapper implements AFCConstants {
         return new FileHandle(id, pi.eval(id + ".file_open('" + fileName + "')"), fileName);
     }
 
-    public void file_remove(String fileName) {
-        pi.exec(id + ".file_remove('" + fileName + "')");
+    public void remove(String fileName) {
+        pi.exec(id + ".remove_path('" + fileName + "')");
+    }
+    
+    //Renaming a path is essentially moving it to the same folder
+    //Stupid Fun Fact #1: "renaming" wasn't a thing in UNIX.
+    //There was just "mv", which stood for "move".
+    public void move(String fileName, String newName) {
+        pi.exec(id + ".rename_path('" + fileName + "," + newName + "')");
     }
 
     @Deprecated
