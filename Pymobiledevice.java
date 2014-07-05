@@ -55,18 +55,9 @@ public class Pymobiledevice {
                     }
                 }
             });
+            
             pi = new PythonInterpreter();
             pi.exec("import sys");
-            
-            File[] libs = new File(location, "jar").listFiles(new FilenameFilter() {
-                @Override
-                public boolean accept(File dir, String name) {
-                    return name.toLowerCase().endsWith(".jar");
-                }
-            });
-            for (File lib : libs) {
-                pi.exec("sys.path.append('" + lib.getAbsolutePath().replace("\\", "\\\\") + "')");
-            }
             
             pi.exec("sys.path.append('" + location.getAbsolutePath().replace("\\", "\\\\") + "')");
             initiated = true;
