@@ -15,7 +15,7 @@ public class Lockdown extends Wrapper {
     public static String[] listDevices() {
         List<String> ret = new ArrayList<String>();
         Pymobiledevice.use("pymobiledevice", "lockdown");
-        PyObject[] raws = new PyList(pi.eval("lockdown.list_lockdowns()")).getArray();
+        PyObject[] raws = new PyList(pi.eval("lockdown.list_devices()")).getArray();
         for (PyObject i : raws) {
             ret.add(i.toString());
         }
